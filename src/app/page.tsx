@@ -57,10 +57,19 @@ export default function DashboardPage() {
             </span>
           </div>
 
-          <div className="flex items-center space-x-4 font-mono text-[11px] text-slate-400">
-            <span>Turbofan Dataset: FD001 (Sea-Level, HPC Fault)</span>
-            <span>Target RUL: Piecewise 125 Cycles</span>
-            <span>Scoring: NASA Asymmetric Exponential (exp(d/10) - 1)</span>
+          <div className="flex flex-wrap items-center space-x-4 font-mono text-[11px] text-slate-400">
+            <span>Turbofan Dataset: FD001</span>
+            <span>Target RUL: Piecewise 125</span>
+            <span>Scoring: NASA Asymmetric</span>
+            <a
+              href="https://github.com/Suksha128/nasa_turbofan"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 hover:text-cyan-300 underline underline-offset-2 flex items-center space-x-1"
+            >
+              <span>GitHub: Suksha128/nasa_turbofan</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
           </div>
         </div>
       </footer>
