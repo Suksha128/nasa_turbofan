@@ -4,6 +4,7 @@
 [![React 19](https://img.shields.io/badge/React-19.0.0-blue?style=flat&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Suksha128/nasa_turbofan/blob/main/notebooks/nasa_cmapss_pdm_model.ipynb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > An aerospace-grade, interactive Digital Twin and condition-based predictive maintenance dashboard for commercial turbofan jet engines based on the **NASA C-MAPSS FD001 benchmark**. Features physics-informed Remaining Useful Life (RUL) estimation, NASA asymmetric safety loss auditing, real-time "what-if" fault injection, and automated maintenance ERP dispatching.
@@ -142,6 +143,27 @@ flowchart LR
 * **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)
 * **Charts & Visualization:** [Recharts 2.15](https://recharts.org/)
 * **Icons:** [Lucide React](https://lucide.dev/)
+
+## 🧠 Machine Learning & Deep Learning Notebook (Google Colab)
+
+A production-grade Python notebook is provided to train and evaluate ML/DL models on the actual NASA C-MAPSS dataset:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Suksha128/nasa_turbofan/blob/main/notebooks/nasa_cmapss_pdm_model.ipynb)
+
+* **Direct Colab Link:** [Open `notebooks/nasa_cmapss_pdm_model.ipynb` in Google Colab](https://colab.research.google.com/github/Suksha128/nasa_turbofan/blob/main/notebooks/nasa_cmapss_pdm_model.ipynb)
+* **Standalone Python Script:** [`notebooks/train_models.py`](./notebooks/train_models.py)
+
+### Implemented Models & Features:
+1. **Automated Ingestion:** Downloads official `train_FD001.txt`, `test_FD001.txt`, `RUL_FD001.txt`.
+2. **Piecewise RUL Target:** 125-cycle upper bound clamping following NASA benchmark literature.
+3. **Sensor Pruning:** Drops 7 zero-variance channels (`s_1, s_5, s_6, s_10, s_16, s_18, s_19`).
+4. **Feature Engineering:** Trailing 5-cycle rolling mean and standard deviation.
+5. **Models Trained:**
+   - **Random Forest Regressor** (120 estimators, depth 12)
+   - **XGBoost Regressor** (Gradient-boosted decision trees)
+   - **PyTorch 2-Layer LSTM** (30-cycle temporal sequence window with Dropout)
+6. **Aviation Evaluation:** Calculates RMSE, MAE, $R^2$, and the official **NASA Asymmetric Penalty Score**.
+7. **Visualizations:** Sorted test fleet RUL trajectories, top-10 Gini feature importances, and asymmetric error penalty curves.
 
 ---
 
