@@ -1,17 +1,16 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const isGithubActions = process.env.GITHUB_ACTIONS === "true";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: "export",
+  // Set basePath and assetPrefix only if deploying to GitHub Pages
   basePath: isGithubActions ? "/nasa_turbofan" : "",
-  assetPrefix: isGithubActions ? "/nasa_turbofan" : undefined,
+  assetPrefix: isGithubActions ? "/nasa_turbofan" : "",
   images: {
-    unoptimized: true,
+    unoptimized: true, // Required for static export on GitHub Pages
   },
-  outputFileTracingRoot: path.resolve(__dirname),
 };
 
 export default nextConfig;
