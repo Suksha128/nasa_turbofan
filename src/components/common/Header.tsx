@@ -13,7 +13,9 @@ import {
   Cpu,
   ChevronRight,
   Github,
-  ExternalLink
+  ExternalLink,
+  Compass,
+  Bot
 } from 'lucide-react';
 
 export function Header() {
@@ -21,7 +23,9 @@ export function Header() {
     activeScreen, 
     setActiveScreen, 
     selectedEngine, 
-    fleet 
+    fleet,
+    isChatbotOpen,
+    setIsChatbotOpen
   } = usePdm();
 
   const [utcTime, setUtcTime] = useState<string>('');
@@ -52,6 +56,12 @@ export function Header() {
       label: `Digital Twin & Simulator`,
       icon: <Activity className="w-4 h-4" />,
       badge: selectedEngine ? `Unit #${selectedEngine.unitId}` : 'Select',
+    },
+    {
+      id: 'dispatch',
+      label: 'Route Dispatch & Operations',
+      icon: <Compass className="w-4 h-4" />,
+      badge: 'Airworthiness',
     },
     {
       id: 'architecture',
@@ -137,6 +147,15 @@ export function Header() {
                 );
               })}
             </nav>
+
+            <button
+              onClick={() => setIsChatbotOpen(!isChatbotOpen)}
+              className="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-cyan-600/30 to-blue-600/30 hover:from-cyan-600/50 hover:to-blue-600/50 text-cyan-300 border border-cyan-500/40 text-xs font-medium transition-all shadow-sm"
+              title="Toggle AeroCopilot AI Advisor"
+            >
+              <Bot className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden sm:inline">AI Copilot</span>
+            </button>
 
             <a
               href="https://github.com/Suksha128/nasa_turbofan"

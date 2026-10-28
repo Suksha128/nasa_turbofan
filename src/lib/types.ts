@@ -73,3 +73,53 @@ export interface ArchitectureStage {
   codeSnippet: string;
   keyTakeaway: string;
 }
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp: string;
+  suggestedActions?: string[];
+  engineSnapshot?: {
+    unitId: number;
+    predictedRul: number;
+    status: HealthStatus;
+    primaryStress: string;
+  };
+}
+
+export interface FlightRoute {
+  id: string;
+  name: string;
+  origin: string;
+  destination: string;
+  distanceNm: number;
+  flightHours: number;
+  severityMultiplier: number;
+  etopsRequired: boolean;
+  typicalAircraft: string;
+}
+
+export interface DispatchClearance {
+  status: 'GO' | 'CONDITIONAL_DERATE' | 'NO_GO_AOG';
+  clearanceTitle: string;
+  projectedPostFlightRul: number;
+  ifsdRiskPerFlightHour: number;
+  recommendedDeratePercent: number;
+  etopsCleared: boolean;
+  operationalNotes: string[];
+}
+
+export interface FaultDiagnostic {
+  symptomId: string;
+  title: string;
+  affectedTransducers: string[];
+  suspectedRootCauses: {
+    cause: string;
+    probability: number;
+    subsystem: 'HPC' | 'LPT' | 'COMBUSTOR' | 'FADEC_FUEL';
+    boeingFimRef: string;
+    easaPartMTask: string;
+    correctiveAction: string;
+  }[];
+}

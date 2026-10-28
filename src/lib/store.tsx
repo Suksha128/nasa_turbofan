@@ -5,8 +5,12 @@ import { EngineUnit, HealthStatus, SensorReading, TelemetryPoint, ArchitectureSt
 import { generateFleet } from './dataset-generator';
 import { predictRul, SENSOR_BASELINES } from './ml-engine';
 import { ARCHITECTURE_STAGES } from './architecture-data';
+import { generateAeroResponse } from './chatbot-engine';
+import { FLIGHT_ROUTES } from './flight-routes';
+import { FAULT_DIAGNOSTICS } from './fault-data';
+import { ChatMessage } from './types';
 
-export type ScreenTab = 'fleet' | 'twin' | 'architecture';
+export type ScreenTab = 'fleet' | 'twin' | 'architecture' | 'dispatch';
 export type SortOption = 'rul_asc' | 'rul_desc' | 'unit_asc' | 'cycle_desc' | 'health_asc';
 
 interface PdmContextType {
@@ -45,6 +49,29 @@ interface PdmContextType {
   // Architecture Stage Modal
   selectedArchitectureStage: ArchitectureStage | null;
   setSelectedArchitectureStage: (stage: ArchitectureStage | null) => void;
+
+  // AeroCopilot AI Chatbot
+  isChatbotOpen: boolean;
+  setIsChatbotOpen: (open: boolean) => void;
+  chatMessages: ChatMessage[];
+  sendChatMessage: (content: string) => void;
+  clearChatMessages: () => void;
+
+  // Flight Route Dispatch Simulator
+  selectedDispatchRouteId: string;
+  setSelectedDispatchRouteId: (id: string) => void;
+  takeoffDeratePercent: number;
+  setTakeoffDeratePercent: (val: number) => void;
+
+  // FAA Release Certificate / Maintenance Report Modal
+  isReportModalOpen: boolean;
+  setIsReportModalOpen: (open: boolean) => void;
+
+  // Fault Isolation Manual (FIM) Modal
+  isFaultModalOpen: boolean;
+  setIsFaultModalOpen: (open: boolean) => void;
+  selectedFaultSymptomId: string;
+  setSelectedFaultSymptomId: (id: string) => void;
 }
 
 const PdmContext = createContext<PdmContextType | null>(null);
@@ -68,6 +95,32 @@ export function PdmProvider({ children }: { children: React.ReactNode }) {
 
   // Explainability modal
   const [selectedArchitectureStage, setSelectedArchitectureStage] = useState<ArchitectureStage | null>(null);
+
+  // New features: Chatbot
+  const [isChatbotOpen, setIsChatbotOpen] = useState<boolean>(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    {
+      id: 'welcome',
+      role: 'assistant',
+      content: 'Hello! I am **AeroCopilot**, your aerospace predictive maintenance assistant. I have live telemetry access to the NASA C-MAPSS FD001 fleet. Ask me for real-time engine diagnostics, aerothermal root-cause analysis, or flight route dispatch clearances.',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      suggestedActions: [
+        'Diagnose current engine',
+        'Why is Ps30 the top sensor?',
+        'Explain NASA Asymmetric Loss',
+        'List all Critical AOG units',
+      ],
+    },
+  ]);
+
+  // New features: Route Dispatcher
+  const [selectedDispatchRouteId, setSelectedDispatchRouteId] = useState<string>('JFK-LHR');
+  const [takeoffDeratePercent, setTakeoffDeratePercent] = useState<number>(10);
+
+  // New features: Maintenance Report Modal & Fault Isolation Modal
+  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+  const [isFaultModalOpen, setIsFaultModalOpen] = useState<boolean>(false);
+  const [selectedFaultSymptomId, setSelectedFaultSymptomId] = useState<string>('HPC_PRESSURE_DROP');
 
   // Generate fleet on initial client load
   useEffect(() => {
@@ -261,6 +314,57 @@ export function PdmProvider({ children }: { children: React.ReactNode }) {
     return result;
   }, [fleet, filterStatus, searchTerm, sortBy]);
 
+  // Chat message sender
+  const sendChatMessage = useCallback(
+    (content: string) => {
+      const userMsg: ChatMessage = {
+        id: `user-${Date.now()}`,
+        role: 'user',
+        content,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+
+      const response = generateAeroResponse(content, {
+        selectedEngine,
+        currentTelemetryPoint,
+        fleet,
+      });
+
+      const assistantMsg: ChatMessage = {
+        id: `assistant-${Date.now() + 1}`,
+        role: 'assistant',
+        content: response.reply,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        suggestedActions: response.suggestedActions,
+        engineSnapshot: {
+          unitId: selectedEngine.unitId,
+          predictedRul: currentTelemetryPoint.predictedRul,
+          status: currentTelemetryPoint.status,
+          primaryStress: currentTelemetryPoint.primaryStress,
+        },
+      };
+
+      setChatMessages((prev) => [...prev, userMsg, assistantMsg]);
+    },
+    [selectedEngine, currentTelemetryPoint, fleet]
+  );
+
+  const clearChatMessages = useCallback(() => {
+    setChatMessages([
+      {
+        id: 'welcome-reset',
+        role: 'assistant',
+        content: 'Chat session reset. How can I assist you with turbofan diagnostics today?',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        suggestedActions: [
+          'Diagnose current engine',
+          'Why is Ps30 the top sensor?',
+          'Explain NASA Asymmetric Loss',
+        ],
+      },
+    ]);
+  }, []);
+
   const value = {
     fleet,
     selectedUnitId,
@@ -289,6 +393,24 @@ export function PdmProvider({ children }: { children: React.ReactNode }) {
     filteredFleet,
     selectedArchitectureStage,
     setSelectedArchitectureStage,
+    // Chatbot
+    isChatbotOpen,
+    setIsChatbotOpen,
+    chatMessages,
+    sendChatMessage,
+    clearChatMessages,
+    // Dispatch
+    selectedDispatchRouteId,
+    setSelectedDispatchRouteId,
+    takeoffDeratePercent,
+    setTakeoffDeratePercent,
+    // Reports & FIM
+    isReportModalOpen,
+    setIsReportModalOpen,
+    isFaultModalOpen,
+    setIsFaultModalOpen,
+    selectedFaultSymptomId,
+    setSelectedFaultSymptomId,
   };
 
   return <PdmContext.Provider value={value}>{children}</PdmContext.Provider>;

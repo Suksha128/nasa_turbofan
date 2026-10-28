@@ -6,6 +6,10 @@ import { Header } from '@/components/common/Header';
 import { FleetOverviewView } from '@/components/fleet/FleetOverviewView';
 import { EngineTwinView } from '@/components/twin/EngineTwinView';
 import { ArchitectureView } from '@/components/explainability/ArchitectureView';
+import { FlightDispatchView } from '@/components/dispatch/FlightDispatchView';
+import { AeroCopilot } from '@/components/chat/AeroCopilot';
+import { MaintenanceReportModal } from '@/components/report/MaintenanceReportModal';
+import { FaultIsolationModal } from '@/components/troubleshoot/FaultIsolationModal';
 import { ShieldCheck, Database, FileText, ExternalLink, Cpu } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -19,12 +23,12 @@ export default function DashboardPage() {
       {/* Main Content Body */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Active Engine Context Banner (shown on Twin view or when an engine is selected) */}
-        {activeScreen === 'twin' && selectedEngine && (
+        {(activeScreen === 'twin' || activeScreen === 'dispatch') && selectedEngine && (
           <div className="flex flex-wrap items-center justify-between px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300">
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
               <span className="font-semibold text-slate-100 font-mono">
-                TELEMETRY DIGITAL TWIN: UNIT #{selectedEngine.unitId}
+                TELEMETRY CONTEXT: UNIT #{selectedEngine.unitId}
               </span>
               <span className="text-slate-500">|</span>
               <span className="text-slate-400 font-mono">{selectedEngine.tailNumber}</span>
@@ -44,8 +48,14 @@ export default function DashboardPage() {
         {/* Dynamic Screen View */}
         {activeScreen === 'fleet' && <FleetOverviewView />}
         {activeScreen === 'twin' && <EngineTwinView />}
+        {activeScreen === 'dispatch' && <FlightDispatchView />}
         {activeScreen === 'architecture' && <ArchitectureView />}
       </main>
+
+      {/* Interactive Global Overlays & Modals */}
+      <AeroCopilot />
+      <MaintenanceReportModal />
+      <FaultIsolationModal />
 
       {/* Aerospace Engineering Footer */}
       <footer className="border-t border-slate-900 bg-slate-950/80 py-6 text-xs text-slate-500">

@@ -12,7 +12,8 @@ import {
   Wrench, 
   ExternalLink,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Compass
 } from 'lucide-react';
 
 export function FleetTable() {
@@ -212,19 +213,34 @@ export function FleetTable() {
                       </div>
                     </td>
 
-                    {/* Inspect Button */}
+                    {/* Inspect & Dispatch Buttons */}
                     <td className="py-3.5 px-4 text-right">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleInspect(engine.unitId);
-                        }}
-                        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-cyan-700 text-slate-200 hover:text-white text-xs font-medium transition-all group-hover:border-cyan-500/50 border border-slate-700"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Inspect</span>
-                        <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
-                      </button>
+                      <div className="flex items-center justify-end space-x-1.5">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedUnitId(engine.unitId);
+                            setActiveScreen('dispatch');
+                          }}
+                          className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-cyan-950/70 hover:bg-cyan-900 text-cyan-300 hover:text-white text-xs font-medium border border-cyan-800/80 transition-all"
+                          title="Test Flight Route Dispatch Clearance"
+                        >
+                          <Compass className="w-3.5 h-3.5" />
+                          <span className="hidden xl:inline">Dispatch</span>
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleInspect(engine.unitId);
+                          }}
+                          className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-cyan-700 text-slate-200 hover:text-white text-xs font-medium transition-all group-hover:border-cyan-500/50 border border-slate-700"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Twin</span>
+                          <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

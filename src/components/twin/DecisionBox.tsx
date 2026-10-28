@@ -12,11 +12,19 @@ import {
   AlertTriangle,
   PlaneTakeoff,
   Clock,
-  SendHorizontal
+  SendHorizontal,
+  FileCheck2,
+  Compass
 } from 'lucide-react';
 
 export function DecisionBox() {
-  const { currentTelemetryPoint, selectedEngine } = usePdm();
+  const { 
+    currentTelemetryPoint, 
+    selectedEngine,
+    setIsReportModalOpen,
+    setIsFaultModalOpen,
+    setActiveScreen
+  } = usePdm();
   const { predictedRul, status, primaryStress } = currentTelemetryPoint;
 
   let clearance: 'UNRESTRICTED' | 'CONDITIONAL_RESTRICTED' | 'GROUNDED';
@@ -137,22 +145,41 @@ export function DecisionBox() {
         </div>
       </div>
 
-      {/* Dispatch Work Order Button */}
-      <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-        <div className="flex items-center space-x-2 text-slate-400">
-          <Clock className="w-3.5 h-3.5" />
-          <span>Turnaround: <span className="text-slate-200 font-mono font-medium">{leadTime}</span></span>
+      {/* Dispatch Actions Bar */}
+      <div className="mt-4 pt-3 border-t border-slate-800 space-y-2.5 text-xs">
+        <div className="flex items-center justify-between text-slate-400">
+          <div className="flex items-center space-x-1.5">
+            <Clock className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Turnaround: <span className="text-slate-200 font-mono font-medium">{leadTime}</span></span>
+          </div>
+          <span className="text-[10px] font-mono text-slate-500">MRO Station 04</span>
         </div>
 
-        <button
-          onClick={() => {
-            alert(`Dispatched SAP/Amos Work Order for Engine Unit #${selectedEngine?.unitId} (${selectedEngine?.tailNumber}). Status: ${clearance}.`);
-          }}
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-cyan-700 text-slate-200 hover:text-white font-medium text-xs border border-slate-700 hover:border-cyan-500 transition-all shadow-sm"
-        >
-          <SendHorizontal className="w-3.5 h-3.5" />
-          <span>Dispatch Work Order</span>
-        </button>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <button
+            onClick={() => setIsReportModalOpen(true)}
+            className="flex items-center justify-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all shadow-sm"
+          >
+            <FileCheck2 className="w-3.5 h-3.5 text-cyan-400" />
+            <span>FAA 8130-3 Cert</span>
+          </button>
+
+          <button
+            onClick={() => setIsFaultModalOpen(true)}
+            className="flex items-center justify-center space-x-1.5 px-3 py-2 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all shadow-sm"
+          >
+            <Wrench className="w-3.5 h-3.5 text-amber-400" />
+            <span>FIM Diagnostics</span>
+          </button>
+
+          <button
+            onClick={() => setActiveScreen('dispatch')}
+            className="flex items-center justify-center space-x-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold transition-all shadow-md shadow-cyan-950/40"
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>Route Dispatch</span>
+          </button>
+        </div>
       </div>
     </div>
   );
